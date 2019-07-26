@@ -25,4 +25,42 @@ const localLogin = new LocalStrategy(localOptions, async (email, password, done)
     }
 })
 
+// Set up options of Jwt Strategy
+// We need to tell our strategy where to look for the token
+
+const jwtOptions = {
+    // Tells Jwt Strategy that whenever a request comes in
+    // and we want passport to handle it
+    // it needs to look in the header for the property call authorization
+    jwtFromRequest: ExtractJwt.fromHeader("authorization"),
+    // tells jwt strategy what secret we used to encode the token
+    // so that it can decode it
+    secretOrKey: config.secret
+}
+
+// We are going to get the payload argument from an incoming request
+// The payload argument is coming from the function that we will create in authRoutes
+// done is the function we call once we tried to autenticate this user
+
+const jwtLogin = new JwtStrategy(jwtOptions, async (payload, done) => {
+    try {
+        const user = await User.findById(payload.sub);
+        if (user) {
+            done(null, user);
+        } else {
+            done(null, false);
+        }
+    } catch (e) {
+        done(e, false);
+    }
+})
+
+// This tells passport that we declared these strategies
+// The local login says we have a strategy called "local"
+// The jwt login says we have a strategy called "jwt"
+
+// When we say passport.authenticate("jwt")
+// passport will look for a strategy called "jwt"
+
 passport.use(localLogin);
+passport.use(jwtLogin);

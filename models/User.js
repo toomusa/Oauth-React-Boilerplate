@@ -26,7 +26,7 @@ const UserSchema = new Schema ({
 
 UserSchema.pre("save", async function(next) {
     const user = this;
-    try {
+    try { 
         const salt = await bcrypt.genSalt();
         console.log("salt", salt);
         const hash = await bcrypt.hash(user.password, salt);
@@ -38,10 +38,13 @@ UserSchema.pre("save", async function(next) {
     }
 })
 
+// methods attach to each instance of a document when queried 
 UserSchema.methods.comparePassword = async function(candidatePassword, callback){
     const user = this;
     try {
+        // compare entered password to existing password
         const isMatch = await bcrypt.compare(candidatePassword, user.password);
+        // first parameter is error, second is response object (user or false)
         callback(null, isMatch);
     } catch(e) {
         callback(e);
