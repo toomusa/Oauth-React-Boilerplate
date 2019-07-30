@@ -59,7 +59,6 @@ class Signup extends Component {
                     />
                 </fieldset>
                 <button>Signup</button>
-                <button>Cancel</button>
             </form>
         )
     }
